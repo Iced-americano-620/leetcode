@@ -1,0 +1,121 @@
+# 我们从二叉树的根节点 root 开始进行深度优先搜索。
+#
+#  在遍历中的每个节点处，我们输出 D 条短划线（其中 D 是该节点的深度），然后输出该节点的值。（如果节点的深度为 D，则其直接子节点的深度为 D + 1。
+# 根节点的深度为 0）。
+#
+#  如果节点只有一个子节点，那么保证该子节点为左子节点。
+#
+#  给出遍历输出 S，还原树并返回其根节点 root。
+#
+#
+#
+#  示例 1：
+#
+#
+#
+#  输入："1-2--3--4-5--6--7"
+# 输出：[1,2,5,3,4,6,7]
+#
+#
+#  示例 2：
+#
+#
+#
+#  输入："1-2--3---4-5--6---7"
+# 输出：[1,2,5,3,null,6,null,4,null,7]
+#
+#
+#  示例 3：
+#
+#
+#
+#  输入："1-401--349---90--88"
+# 输出：[1,401,null,349,88,90]
+#
+#
+#
+#
+#  提示：
+#
+#
+#  原始树中的节点数介于 1 和 1000 之间。
+#  每个节点的值介于 1 和 10 ^ 9 之间。
+#
+#  Related Topics 树 深度优先搜索
+#  👍 154 👎 0
+
+
+# leetcode submit region begin(Prohibit modification and deletion)
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class TreeNode(object):
+    pass
+
+
+class Solution(object):
+    def recoverFromPreorder(self, S):
+        """
+        :type S: str
+        :rtype: TreeNode
+        """
+
+        def helper(string, cnt):
+            # lr代表包含左子树和右子树的字符串
+            lr = string[string.find(cnt * "-") + 1:].strip("-")
+
+            if len(lr) == 0:  # 连根节点都没有
+                return None
+
+            scnt = string.count("-")
+            if scnt == 0:
+                # print "no left children and no right children", string
+                return TreeNode(int(string))
+
+            node = TreeNode(string[:string.find(cnt * "-")])
+
+            # ----------以下在找区分左右子树的分界线
+            c = 0
+            pos = -1
+            for i in range(len(lr)):
+                if lr[i] == "-":
+                    c += 1
+                else:
+                    if c == cnt:
+                        pos = i
+                        break
+                    c = 0
+            # ----------以上在找区分左右子树的分界线
+
+            if pos == -1:  # 没找到右子树开始的标志，说明只有left
+                node.left = helper(lr, cnt + 1)
+                node.right = None
+            else:
+                l = lr[:pos - cnt]
+                r = lr[pos:]
+                # print "leftpart is", l
+                # print "rightpart is", r
+                node.right = helper(r, cnt + 1)
+                node.left = helper(l, cnt + 1)
+
+            return node
+
+        return helper(S, 1)
+
+if __name__ == "__main__":
+    r = Solution()
+    rs = r.recoverFromPreorder("1-2--3--4-5--6--7")
+    print(rs)
+
+
+# leetcode submit region end(Prohibit modification and deletion)
